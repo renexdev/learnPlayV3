@@ -1,0 +1,59 @@
+@(userForm: Form[User])
+		@*@(user: Option[User]) 
+		Rather than using a user (even in an option to avoid NPE) directly, we're
+now using the server-side form itself *@
+	@main("Testing User class"){
+	@if(userForm.hasErrors) {
+        <div style="background-color:red; color:white;">The form has @userForm.errors.size errors</div>
+    }
+
+	@if(userForm.value.isDefined){
+
+		<h1>@userForm.get.name (@userForm.get.age)</h1>
+		<h2>Lives at @userForm.get.address.fullStreet</h2>
+	} else{
+		<h1>Feed user name</h1>
+		
+		@*v2
+		<form method="GET" action="/data/post" >
+			<input type="text" name="name"/>
+			<input type="submit" name="send" value="Feed"/>
+		</form>
+		*@
+				
+		@helper.form(action = routes.Data.post()) {
+		@*A  form template that generates an HTML form tag. Passing it a route, it will be able	to set the correct action and method attributes according to what is defined in the routes file. *@
+            
+            @helper.inputText(userForm("name"))
+            @helper.inputText(userForm("email"))
+        	@*a template that generates an HTML input tag of type text. To generate it, it requires a form's field, which is retrieved by using the given form instance, using it as a function with the field name (userForm("name")). *@
+        	
+        	@helper.input(userForm("age")) { (id, name, value, args) =>
+                <input type="number" name="@name" id="@id" @toHtmlArgs(args)>
+            }
+
+           @helper.checkbox(userForm("female"))
+
+           <fieldset>
+           @* we defined the input text for fullStreet and county. we can navigate the object's graph in the forms simply by using the dot notation. The only thing to ensure in this case is that every intermediate object is at least initialized to dummies (otherwise an NPE will be thrown).
+           *@
+                <legend>Address</legend>
+                @helper.inputText(userForm("address.fullStreet"))
+                @helper.inputText(
+                    userForm("address.county"),
+                    '_label -> "County"
+                )
+                @helper.select(userForm("address.country"), Seq(
+                    "" -> "---",
+                    "AR" -> "Arda",
+                    "BE" -> "Belgium",
+                    "SL" -> "Smurfs Land")
+                )
+                @* a list of Tuple2 values where the first component is the value
+				that will be sent with the form and the second component is the display one*@
+            </fieldset>
+        	<input type="submit" name="send" value="Feed" />
+        }
+        
+	}
+}

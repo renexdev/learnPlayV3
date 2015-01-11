@@ -1,0 +1,18 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                           controllers.Application.index()
+#User class
+GET     /data                           controllers.Data.show()
+#User form
+POST     /data/post                           controllers.Data.post()
+# TEMP for tests
+GET     /test/page                  controllers.JDBC.page
+GET     /test/create                controllers.JDBC.table
+GET     /test/:value                controllers.JDBC.test(value:String)
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)
+
+
